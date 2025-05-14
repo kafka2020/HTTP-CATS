@@ -26,17 +26,14 @@ public class Main {
 
         HttpGet request = new HttpGet(REMOTE_SERVICE_URI);
 
-        CloseableHttpResponse response = httpClient.execute(request);
-
-        List<Fact> facts = mapper.readValue(
-                        EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8),
-                        new TypeReference<List<Fact>>() {}
-                ).stream()
-                .filter(value -> value.getUpvotes() != null && value.getUpvotes() > 0)
-                .toList();
-        facts.forEach(System.out::println);
-
-        response.close();
-        httpClient.close();
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+            List<Fact> facts = mapper.readValue(
+                            EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8),
+                            new TypeReference<List<Fact>>() {}
+                    ).stream()
+                    .filter(value -> value.getUpvotes() != null && value.getUpvotes() > 0)
+                    .toList();
+            facts.forEach(System.out::println);
+        }
     }
 }
